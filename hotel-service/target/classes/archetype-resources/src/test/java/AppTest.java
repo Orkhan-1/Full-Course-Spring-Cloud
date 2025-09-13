@@ -1,4 +1,4 @@
-package $com.orkhangasanov;
+package $com.example;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

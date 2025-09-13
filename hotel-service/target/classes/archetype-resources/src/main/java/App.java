@@ -1,4 +1,4 @@
-package $com.orkhangasanov;
+package $com.example;
 
 /**
  * Hello world!
