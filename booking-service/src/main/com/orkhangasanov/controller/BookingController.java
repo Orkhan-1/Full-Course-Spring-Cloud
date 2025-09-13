@@ -15,11 +15,8 @@ import java.util.Map;
 @RestController
 public class BookingController {
 
-    @Value("${spring.application.name}")
-    private String serviceName;
-
     @GetMapping("/booking/status")
-    public Map<String, String> getBookingStatus() {
-        return Map.of("service", serviceName, "status", "Booking service is up and running!");
+    public String getBookingStatus() {
+        return "Booking service is up and running!";
     }
 }
