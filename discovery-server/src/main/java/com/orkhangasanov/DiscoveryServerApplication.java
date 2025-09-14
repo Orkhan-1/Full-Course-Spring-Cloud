@@ -11,3 +11,27 @@ public class DiscoveryServerApplication {
         SpringApplication.run(DiscoveryServerApplication.class, args);
     }
 }
+
+// 10 Microservices
+// Service A -> Service B (ip:port)
+// Service B -> Service D (ip:port)
+// Service C -> Service D (ip:port)
+
+
+
+
+// Discovery Server (Eureka)
+// Service A -> registers in Discovery Server (A-service)
+// Service B -> registers in Discovery Server (B-service)
+// Service C -> registers in Discovery Server (C-service)
+// Service D -> registers in Discovery Server (D-service)
+
+
+// Service A -> Service B (B-service)
+// Service B -> Service D (D-service)
+
+
+// Discovery Server (Eureka) (Service sends a heartbeat every 30 seconds)
+// Service A -> Discovery Server (heartbeat -> I'm alive)
+// Service B -> Discovery Server (heartbeat -> I'm alive)
+// ...
