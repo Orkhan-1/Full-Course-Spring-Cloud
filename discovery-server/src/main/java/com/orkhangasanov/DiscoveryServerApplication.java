@@ -12,6 +12,17 @@ public class DiscoveryServerApplication {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
 /*
   ================================
           Microservices Setup
