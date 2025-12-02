@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/booking")
@@ -18,6 +20,8 @@ public class BookingController {
 
     @Value("${message}")
     private String message;
+
+    private static final Logger log = LoggerFactory.getLogger(BookingController.class);
 
     @Autowired
     public BookingController() {
@@ -32,10 +36,10 @@ public class BookingController {
     @GetMapping("/hotels")
     @CircuitBreaker(name = HOTEL_SERVICE_CB, fallbackMethod = "getAvailableHotelsFallback")
     public String getAvailableHotels() {
-        // String response = restTemplate.getForObject("http://hotel-service/hotels", String.class);
-        // return "Booking Service called Hotel Service --> " + response;
+        log.info("Received booking request in BookingService");
         String response = hotelClient.getHotels();
-        return "Booking Service: " + message;
+        log.info("Response from HotelService: {}", response);
+        return "BookingService processed booking → " + response;
     }
 
     public String getAvailableHotelsFallback(Throwable throwable) {
