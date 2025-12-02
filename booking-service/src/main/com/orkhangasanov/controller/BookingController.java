@@ -1,22 +1,27 @@
 package main.com.orkhangasanov.controller;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import main.com.orkhangasanov.client.HotelClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/booking")
 public class BookingController {
 
-    private final RestTemplate restTemplate;
+    @Autowired
+    private HotelClient hotelClient;
     private static final String HOTEL_SERVICE_CB = "hotelServiceCircuitBreaker";
 
+    @Value("${message}")
+    private String message;
+
     @Autowired
-    public BookingController(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public BookingController() {
+
     }
 
     @GetMapping("/status")
@@ -27,8 +32,10 @@ public class BookingController {
     @GetMapping("/hotels")
     @CircuitBreaker(name = HOTEL_SERVICE_CB, fallbackMethod = "getAvailableHotelsFallback")
     public String getAvailableHotels() {
-        String response = restTemplate.getForObject("http://hotel-service/hotels", String.class);
-        return "Booking Service called Hotel Service --> " + response;
+        // String response = restTemplate.getForObject("http://hotel-service/hotels", String.class);
+        // return "Booking Service called Hotel Service --> " + response;
+        String response = hotelClient.getHotels();
+        return "Booking Service: " + message;
     }
 
     public String getAvailableHotelsFallback(Throwable throwable) {
@@ -37,26 +44,53 @@ public class BookingController {
 }
 
 /*
- * Resilience4j — a lightweight fault tolerance library for Java 8+,
- * inspired by Netflix Hystrix. It is designed for functional programming
- * and helps build resilient distributed systems.
- *
- * Core Features:
- *
- * 1. Circuit Breaker:
- *    - Prevents cascading failures by temporarily blocking calls to failing services.
- *
- * 2. Retry:
- *    - Automatically retries failed operations with configurable backoff strategies.
- *
- * 3. Rate Limiter:
- *    - Controls the number of
- * calls allowed within a specified time window.
- *
- * 4. Bulkhead:
- *    - Limits concurrent executions to prevent resource exhaustion (similar to thread pools).
- *
- * 5. Time Limiter:
- *    - Defines timeouts for asynchronous operations to avoid indefinite waits.
+  ╔══════════════════════════════════════════════════════════╗
+  ║              SPRING CLOUD OPENFEIGN                      ║
+  ╚══════════════════════════════════════════════════════════╝
 
- */
+    MICROSERVICE COMMUNICATION PATTERNS
+  ─────────────────────────────────────────
+  Traditional HTTP client approach:
+
+      [Service A] ──[RestTemplate/HttpClient]──> [Service B]
+          │                   │
+          │                   │
+          ▼                   ▼
+     Verbose code       Manual serialization
+     Error handling     Connection management
+     URL construction   Retry logic
+
+  PROBLEM:
+  ───────────
+  - Repetitive boilerplate code in every service
+  - Error-prone string manipulation for URLs/parameters
+  - Difficult to maintain and test
+  - No type safety when calling other services
+  - Service discovery integration requires manual coding
+
+  SOLUTION: OPENFEIGN - DECLARATIVE HTTP CLIENT
+  ───────────────────────────────────────────────
+  Write interfaces, not implementation code
+
+      [Service A] ──[Feign Interface]──> [Service B]
+          │                   │
+          │                   │
+          ▼                   ▼
+     Clean interface    Auto-generated HTTP client
+     Type-safe calls    Built-in serialization
+     Annotations        Service discovery ready
+
+  HOW IT WORKS
+  ───────────────
+  1) Feign talks to **Eureka** to discover the service location.
+  2) Uses **LoadBalancer** for client-side load balancing.
+  3) Sends HTTP requests behind the scenes using WebClient or RestTemplate.
+
+  ADVANTAGES
+  ─────────────
+  - No manual RestTemplate boilerplate
+  - Easy interface-based service-to-service calls
+  - Built-in integration with Eureka, LoadBalancer, and Spring Cloud Config
+  - Supports interceptors, retries, and fault tolerance (with Resilience4j)
+
+*/
