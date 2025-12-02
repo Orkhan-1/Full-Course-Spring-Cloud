@@ -14,4 +14,4 @@ spring:
     config:
       server:
         git:
-          uri: file:///Users/orkhangasanov/Projects/spring-config-repo
+          uri: file:///Users/{user}/Projects/spring-config-repo
